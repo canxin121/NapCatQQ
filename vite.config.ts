@@ -9,6 +9,8 @@ import { builtinModules } from 'module';
 import fs from 'node:fs';
 import babel from 'vite-plugin-babel';
 import { version } from 'os';
+import commonjs from 'vite-plugin-commonjs';
+
 // "@rollup/plugin-babel": "^6.0.4",
 const external = ['silk-wasm', 'ws', 'express', 'fluent-ffmpeg', 'log4js', 'qrcode-terminal'];
 
@@ -33,6 +35,7 @@ if (process.env.NAPCAT_BUILDSYS == 'linux') {
 
 const baseConfigPlugin: PluginOption[] = [
   // PreprocessorDirectives(),
+  commonjs(/* options */),
   babel({
     filter: /.*\.(ts|js)$/,
     babelConfig: {

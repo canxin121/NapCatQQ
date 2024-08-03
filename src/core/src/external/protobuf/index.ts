@@ -1,9 +1,9 @@
-import pb from './protobuf.min';
+
 import * as zlib from 'zlib';
 import fs from 'fs';
 import path from 'path';
 import process from 'process';
-
+let pb = require('./protobuf.min');
 export interface Encodable {
   [tag: number]: any;
 }
@@ -58,7 +58,7 @@ export class Proto implements Encodable {
   }
 }
 
-function _encode(writer: pb.Writer, tag: number, value: any) {
+function _encode(writer: any, tag: number, value: any) {
   if (value === null || value === undefined) return;
   let type = 2;
   if (typeof value === 'number') {
@@ -94,16 +94,16 @@ function _encode(writer: pb.Writer, tag: number, value: any) {
   const head = (tag << 3) | type;
   writer.uint32(head);
   switch (type) {
-  case 0:
-    if (value < 0) writer.sint64(value);
-    else writer.int64(value);
-    break;
-  case 2:
-    writer.bytes(value);
-    break;
-  case 1:
-    writer.double(value);
-    break;
+    case 0:
+      if (value < 0) writer.sint64(value);
+      else writer.int64(value);
+      break;
+    case 2:
+      writer.bytes(value);
+      break;
+    case 1:
+      writer.double(value);
+      break;
   }
 }
 
@@ -121,13 +121,13 @@ export function encode(obj: Encodable) {
   return writer.finish();
 }
 
-function long2int(long: pb.Long) {
+function long2int(long: any) {
   if (long.high === 0) return long.low >>> 0;
   const bigint = (BigInt(long.high) << 32n) | (BigInt(long.low) & 0xffffffffn);
   const int = Number(bigint);
   return Number.isSafeInteger(int) ? int : bigint;
 }
-function _decode(reader: pb.Reader): Encodable {
+function _decode(reader: any): Encodable {
   const result = {} as Encodable;
   while (reader.pos < reader.len) {
     const k = reader.uint32();
@@ -135,32 +135,32 @@ function _decode(reader: pb.Reader): Encodable {
       type = k & 0b111;
     let value;
     switch (type) {
-    case 0:
-      value = long2int(reader.int64());
-      break;
-    case 1:
-      value = long2int(reader.fixed64());
-      break;
-    case 2:
-      value = Buffer.from(reader.bytes());
-      try {
-        value = new Proto(value);
-        if (!Object.keys(value).length) throw new Error('empty proto');
-      } catch (e) {
-        let temp: string | Buffer = value.toString(); // 先尝试转utf8，不成功再转hex
-        if (temp.includes('\x00')) {
-          if (value[0] == 0x78 && value[1] == 0x9c)
-            temp = `zip://${zlib.unzipSync(value as Buffer).toString()}`;
-          else temp = value as Buffer;
+      case 0:
+        value = long2int(reader.int64());
+        break;
+      case 1:
+        value = long2int(reader.fixed64());
+        break;
+      case 2:
+        value = Buffer.from(reader.bytes());
+        try {
+          value = new Proto(value);
+          if (!Object.keys(value).length) throw new Error('empty proto');
+        } catch (e) {
+          let temp: string | Buffer = value.toString(); // 先尝试转utf8，不成功再转hex
+          if (temp.includes('\x00')) {
+            if (value[0] == 0x78 && value[1] == 0x9c)
+              temp = `zip://${zlib.unzipSync(value as Buffer).toString()}`;
+            else temp = value as Buffer;
+          }
+          value = temp;
         }
-        value = temp;
-      }
-      break;
-    case 5:
-      value = reader.fixed32();
-      break;
-    default:
-      return null as any;
+        break;
+      case 5:
+        value = reader.fixed32();
+        break;
+      default:
+        return null as any;
     }
     if (Array.isArray(result[tag])) {
       result[tag].push(value);

@@ -2,7 +2,7 @@ import { napCatCore } from '@/core';
 import * as pb from './protobuf';
 
 export class NTQQExternaiApi {
-  static sendGroupPoke(groupId: string, uin: string) {
+  static async sendGroupPoke(groupId: string, uin: string) {
     const proto = pb.encode({
       1: 0xed3,
       2: 1,
@@ -11,6 +11,6 @@ export class NTQQExternaiApi {
         2: Number(groupId)
       }
     });
-    napCatCore.session.getMsgService().sendSsoCmdReqByContend('OidbSvcTrpcTcp.0xed3_1', proto);
+    return await napCatCore.session.getMsgService().sendSsoCmdReqByContend('OidbSvcTrpcTcp.0xed3_1', proto);
   }
 }

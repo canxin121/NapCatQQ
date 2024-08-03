@@ -19,6 +19,6 @@ export class GroupPoke extends BaseAction<Payload, any> {
   actionName = ActionName.GroupPoke;
 
   protected async _handle(payload: Payload) {
-    NTQQExternaiApi.sendGroupPoke(payload.group_id.toString(), payload.user_id.toString());
+    return await NTQQExternaiApi.sendGroupPoke(payload.group_id.toString(), payload.user_id.toString());
   }
 }
