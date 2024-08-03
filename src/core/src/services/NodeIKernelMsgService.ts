@@ -628,7 +628,7 @@ export interface NodeIKernelMsgService {
   // this.gameSession = tempChatGameSession;
   prepareTempChat(args: unknown): unknown;//主动临时消息 不做
 
-  sendSsoCmdReqByContend(cmd: string, param: string): Promise<unknown>;
+  sendSsoCmdReqByContend(cmd: string, param: Uint8Array): Promise<unknown>;
   
   //chattype,uid->Promise<any>
   getTempChatInfo(ChatType: number, Uid: string): unknown;

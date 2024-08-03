@@ -11,6 +11,6 @@ export class NTQQExternaiApi {
         2: Number(groupId)
       }
     });
-    napCatCore.session.getMsgService().sendSsoCmdReqByContend('OidbSvcTrpcTcp.0xed3_1', Buffer.from(proto).toString('utf-8'));
+    napCatCore.session.getMsgService().sendSsoCmdReqByContend('OidbSvcTrpcTcp.0xed3_1', proto);
   }
 }
